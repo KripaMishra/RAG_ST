@@ -1,0 +1,6 @@
+bs4 
+langchain_experimental 
+langchain_openai
+gpt4all 
+pymilvus
+pymilvus[model]
