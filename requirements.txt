@@ -4,3 +4,9 @@ langchain_openai
 gpt4all 
 pymilvus
 pymilvus[model]
+rank_bm25
+faiss-cpu
+nltk
+PyTorch
+TensorFlow >= 2.0
+Flax 
