@@ -55,26 +55,31 @@ class Milvus:
         schema=schema)
 
 
-        index_params = MilvusClient.prepare_index_params()
-
-        index_params.add_index(
-            field_name="vector",
-            metric_type="COSINE",
-            index_type="FLAT",
-            index_name="vector_index",
-            params={ "nlist": 128 }
-        )
-        self.client.create_index(
-            collection_name=self.collection_name, 
-,
-            index_params=index_params
-        )
+        
         # Create collection with dimensionality
         self.client.create_collection(
             collection_name=self.collection_name,
             dimension=768  # Dimensionality of vectors
         )
-        
+        return print('collection created successfully!! ')
+
+    def create_custom_index(self,metric_type, index_type, index_name):
+        index_params = MilvusClient.prepare_index_params()
+
+        index_params.add_index(
+            field_name="vector",
+            metric_type=metric_type,
+            index_type=index_type,
+            index_name=index_name,
+            params={ "nlist": 128 }
+        )
+        self.client.create_index(
+            collection_name=self.collection_name, 
+
+            index_params=index_params
+        )
+        return print('index created')
+    
     def insert_data(self, content_path):
         embedding_fn = model.DefaultEmbeddingFunction()
 
