@@ -1,15 +1,18 @@
 from langchain_experimental.text_splitter import SemanticChunker
-from langchain_community.embeddings import GPT4AllEmbeddings
 from pymilvus import model
 from pymilvus import MilvusClient, DataType
 from tqdm import tqdm
+from langchain_ai21 import AI21Embeddings
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-model_name = "all-MiniLM-L6-v2.gguf2.f16.gguf"
-gpt4all_kwargs = {'allow_download': True}
+# Configuration
+api_key = os.getenv('AI21_API_KEY')
 client_db = "milvus_demo_test.db"
 collection_name = "tes_Collection"
 
-class Milvus:
+class MilvusHandler:
     def __init__(self, client_db, collection_name):
         self.client_db = client_db
         self.collection_name = collection_name
@@ -18,12 +21,10 @@ class Milvus:
     def semantic_chunking(self, content_path):
         with open(content_path) as f:
             data = f.read()
+        data = data[:1000]  # Truncate data for testing
         
         text_splitter = SemanticChunker(
-            GPT4AllEmbeddings(
-                model_name=model_name,
-                gpt4all_kwargs=gpt4all_kwargs
-            ),
+            AI21Embeddings(api_key=api_key),
             breakpoint_threshold_type="percentile"
         )
 
@@ -44,7 +45,7 @@ class Milvus:
         )
 
         schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
-        schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=768)  # Ensure dimension matches
+        schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=1024)  # Ensure dimension matches
 
         self.client.create_collection(
             collection_name=self.collection_name, 
@@ -72,18 +73,21 @@ class Milvus:
         print('Index created successfully!')
 
     def insert_data(self, content_path):
-        embedding_fn = model.DefaultEmbeddingFunction()
+        embedding_fn = AI21Embeddings(api_key=api_key)
 
         docs = self.semantic_chunking(content_path)  # Get chunked documents
         
-        vectors = embedding_fn.encode_documents(docs)
+        # Ensure the documents are in the correct format
+        texts = [doc.page_content for doc in docs]
+        
+        vectors = embedding_fn.embed_documents(texts)
         
         # Prepare data for insertion
-        data = [
-            {"id": i, "vector": vectors[i], "text": docs[i], "subject": "history"}
-            for i in range(len(vectors))
-        ]
+        data = []
         
+        for i, doc in enumerate(tqdm(docs, desc="Creating embeddings")):
+            data.append({"id": i, "vector": vectors[i], "text": doc.page_content, "subject": "history"})
+
         # Insert data into Milvus collection
         res = self.client.insert(collection_name=self.collection_name, data=data)
                
@@ -100,18 +104,12 @@ class Milvus:
             collection_name=self.collection_name
         )
         return index_description
-    
+
 if __name__ == "__main__":
     content_path = "/home/ubuntu/Steps/formatted_data.txt"
     
-    milvus_instance = Milvus(client_db, collection_name)
+    milvus_instance = MilvusHandler(client_db, collection_name)
 
     milvus_instance.create_collection()
     insert_result = milvus_instance.insert_data(content_path)
     print("Insert data result:", insert_result)
-
-    index_result = milvus_instance.check_indexing()
-    print("Indexing details:", index_result)
-
-    describe_result = milvus_instance.describe_index()
-    print("Index description:", describe_result)

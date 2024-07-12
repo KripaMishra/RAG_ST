@@ -7,6 +7,6 @@ pymilvus[model]
 rank_bm25
 faiss-cpu
 nltk
-PyTorch
+torch
 TensorFlow >= 2.0
 Flax 
