@@ -10,3 +10,5 @@ nltk
 torch
 TensorFlow >= 2.0
 Flax 
+numpy
+transformers
