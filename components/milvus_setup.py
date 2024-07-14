@@ -6,6 +6,7 @@ from pymilvus import (
     DataType,
     Collection,
 )
+import numpy as np
 
 # Connect to Milvus
 def connect_to_milvus(host="localhost", port="19530"):
@@ -46,6 +47,11 @@ def insert_vectors(collection, vectors, ids):
     collection.flush()
     print(f"Inserted {insert_result.insert_count} entities")
 
+# Load the collection
+def load_collection(collection):
+    collection.load()
+    print(f"Collection '{collection.name}' loaded into memory")
+
 # Search vectors
 def search_vectors(collection, search_vectors, top_k):
     search_param = {
@@ -53,7 +59,7 @@ def search_vectors(collection, search_vectors, top_k):
         "params": {"nprobe": 10},
     }
     results = collection.search(
-        search_vectors, "embeddings", search_param, top_k=top_k,
+        search_vectors, "embeddings", search_param, limit=top_k,
         output_fields=["id"]
     )
     return results
@@ -67,13 +73,15 @@ if __name__ == "__main__":
     collection = create_collection(collection_name, dim)
     
     # Generate some example vectors
-    import numpy as np
     num_entities = 1000
     vectors = np.random.rand(num_entities, dim).tolist()
     ids = list(range(num_entities))
     
     # Insert the vectors
     insert_vectors(collection, vectors, ids)
+    
+    # Load the collection into memory
+    load_collection(collection)
     
     # Perform a search
     query = np.random.rand(1, dim).tolist()
