@@ -12,3 +12,5 @@ TensorFlow >= 2.0
 Flax 
 numpy
 transformers
+elasticsearch
+sentence_transformers
