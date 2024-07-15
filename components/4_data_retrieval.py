@@ -1,5 +1,6 @@
 # query_retrieval.py
-
+import json
+from datetime import datetime
 import torch
 from elasticsearch import Elasticsearch
 from pymilvus import (
@@ -28,8 +29,9 @@ es = None
 def setup():
     global collection, es
     connections.connect("default", host="localhost", port="19530")
-    es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': "http"}])
     collection = Collection("documents")
+    collection.load()
 
 def encode_query(query):
     input_ids = question_tokenizer(query, return_tensors='pt')['input_ids']
@@ -67,6 +69,7 @@ def hybrid_search(query, top_k=100, alpha=0.5):
         data=[query_vector.tolist()],
         anns_field="embedding",
         param=search_params,
+        limit= top_k
     )
     dpr_results = [(hit.entity.get('id'), hit.score) for hit in milvus_results[0]]
     
@@ -84,8 +87,14 @@ def hybrid_search(query, top_k=100, alpha=0.5):
 def fetch_documents(doc_ids):
     global collection
     
+    # Remove None values and convert to integers
+    valid_ids = [int(id) for id in doc_ids if id is not None]
+    
+    if not valid_ids:
+        return []  # Return empty list if no valid ids
+    
     results = collection.query(
-        expr=f"id in {doc_ids}",
+        expr=f"id in {valid_ids}",
         output_fields=["id", "content"]
     )
     return [result['content'] for result in results]
@@ -122,7 +131,7 @@ def expand_query_with_keywords(query, num_expansions=3, num_keywords=5):
 
     return final_queries
 
-def retrieve_and_rerank(query, top_k=10):
+def retrieve_and_rerank(query, top_k=3):
     expanded_queries = expand_query_with_keywords(query)
     
     all_results = []
@@ -137,11 +146,55 @@ def retrieve_and_rerank(query, top_k=10):
     
     return [(doc, score) for (doc_id, score), doc in zip(unique_results, top_doc_texts)]
 
+
+
+
+def save_query_results(original_query, expanded_queries, results, file_path=None):
+    """
+    Save the query information and results as a JSON file.
+    
+    :param original_query: The original user query
+    :param expanded_queries: List of expanded queries
+    :param results: List of (document, score) tuples
+    :param file_path: Optional file path. If None, a default path will be used.
+    """
+    # Create a dictionary to store all the information
+    query_data = {
+        "timestamp": datetime.now().isoformat(),
+        "original_query": original_query,
+        "expanded_queries": expanded_queries,
+        "results": [
+            {
+                "document": doc,
+                "score": float(score)  # Convert score to float for JSON serialization
+            }
+            for doc, score in results
+        ]
+    }
+
+    # Generate a default file path if none is provided
+    if file_path is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_path = f"/home/ubuntu/project/Steps/retrieved_result/query_results_{timestamp}.json"
+    
+    # Save the data to a JSON file
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(query_data, f, ensure_ascii=False, indent=4)
+    
+    print(f"Query results saved to {file_path}")
+
+# Example usage:
+# save_query_results(original_query, expanded_queries, results)
+
+
+
 if __name__ == "__main__":
     setup()
     
-    query = "Example query"
+    query = " How do I install the Toolkit in a different location? "
     results = retrieve_and_rerank(query)
-    
+    expanded_query=expand_query_with_keywords(query)
+    save_query_results(query,expanded_query, results)
+
     for doc, score in results:
         print(f"Score: {score}, Document: {doc}")
