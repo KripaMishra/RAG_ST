@@ -20,6 +20,11 @@ question_tokenizer = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-q
 context_tokenizer = DPRContextEncoderTokenizer.from_pretrained('facebook/dpr-ctx_encoder-single-nq-base')
 cross_encoder = SentenceTransformer('cross-encoder/ms-marco-MiniLM-L-6-v2')
 
+# Query Expansion specifications
+model_name = 't5-base'
+tokenizer = T5Tokenizer.from_pretrained(model_name)
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+
 
 
 # Global variables
@@ -98,17 +103,28 @@ def hybrid_search(query, top_k=100, alpha=0.5):
     })
     bm25_results = [(hit['_id'], hit['_score']) for hit in es_response['hits']['hits']]
     
-    # DPR search
+    # DPR search with Milvus reranking
     query_vector = encode_query(query)
-    search_params = {"metric_type": "L2", "params": {"nprobe": 10}}
+    search_params = {
+        "metric_type": "L2",
+        "params": {"nprobe": 10},
+        "offset": 0,
+        "limit": top_k,
+        "with_distance": True,
+        "expr": None,
+        "output_fields": ["id", "content"],
+        "round_decimal": -1,
+        "rerank": {
+            "metric_type": "IP",  # Inner Product
+            "params": {"rerank_topk": min(top_k * 2, 100)}  # Rerank top 100 or top_k * 2, whichever is smaller
+        }
+    }
     milvus_results = collection.search(
         data=[query_vector.tolist()],
         anns_field="embedding",
         param=search_params,
-        limit=top_k,
-        output_fields=["id", "content"]
     )
-    dpr_results = [(hit.entity.get('id'), hit.distance) for hit in milvus_results[0]]
+    dpr_results = [(hit.entity.get('id'), hit.score) for hit in milvus_results[0]]
     
     # Combine and normalize scores
     all_ids = set([id for id, _ in bm25_results + dpr_results])
@@ -116,7 +132,7 @@ def hybrid_search(query, top_k=100, alpha=0.5):
     for id in all_ids:
         bm25_score = next((score for doc_id, score in bm25_results if doc_id == id), 0)
         dpr_score = next((score for doc_id, score in dpr_results if doc_id == id), 0)
-        combined_scores[id] = alpha * bm25_score + (1 - alpha) * (1 - dpr_score)  # Invert DPR score as it's a distance
+        combined_scores[id] = alpha * bm25_score + (1 - alpha) * dpr_score
 
     results = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     return results
@@ -131,10 +147,6 @@ def fetch_documents(doc_ids):
     )
     return [result['content'] for result in results]
 
-# Query Expansion
-model_name = 't5-base'
-tokenizer = T5Tokenizer.from_pretrained(model_name)
-model = T5ForConditionalGeneration.from_pretrained(model_name)
 
 def expand_query_with_keywords(query, num_expansions=3, num_keywords=5):
     # Generate expanded queries
@@ -178,7 +190,7 @@ def retrieve_and_rerank(query, top_k=10):
     
     all_results = []
     for expanded_query in expanded_queries:
-        # Hybrid search
+        # Hybrid search with Milvus reranking
         search_results = hybrid_search(expanded_query, top_k=top_k*2)
         all_results.extend(search_results)
     
@@ -189,21 +201,25 @@ def retrieve_and_rerank(query, top_k=10):
     doc_ids = [doc_id for doc_id, _ in unique_results]
     top_doc_texts = fetch_documents(doc_ids)
     
-    # Rerank
-    reranked_docs = rerank(query, top_doc_texts, top_k)
+    # At this point, we've already used Milvus' reranking, so we can either:
+    # 1. Return the results as is, or
+    # 2. Apply an additional reranking step if needed
     
-    return reranked_docs
+    # Option 1: Return results as is
+    return [(doc, score) for (doc_id, score), doc in zip(unique_results, top_doc_texts)]
 
+
+def load_data(input_path):
+    with open(input_path,'r') as content:
+        documents=json.load(content)
+    return documents
 # Main execution
 if __name__ == "__main__":
     setup()
     
     # Example usage
-    documents = [
-        {"id": 1, "content": "This is the first document."},
-        {"id": 2, "content": "This is the second document."},
-        # Add more documents as needed
-    ]
+    input_path="Steps/documents_export.json"
+    documents = load_data()
     
     index_documents(documents)
     
