@@ -52,8 +52,8 @@ def export_to_json(documents, output_file):
 
 if __name__ == '__main__':
     # Usage example
-    file_path = "/home/ubuntu/project/steps/formatted_data.txt"
-    chunk_data_path="/home/ubuntu/project/Steps/chunk_data.json"
-    documents = semantic_chunk_to_documents(file_path)
-    export_to_json(documents,chunk_data_path)
+    input_file_path = "/home/ubuntu/project/steps/formatted_data.txt"
+    output_file_path="/home/ubuntu/project/Steps/chunk_data.json"
+    documents = semantic_chunk_to_documents(input_file_path)
+    export_to_json(documents,output_file_path)
 
