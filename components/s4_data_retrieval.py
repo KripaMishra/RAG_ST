@@ -136,7 +136,7 @@ class CustomRetrieval:
 
         return final_queries
 
-    def retrieve_and_rerank(self, query, top_k=3):
+    def retrieve_and_rerank(self, query, top_k=1):
         expanded_queries = self.expand_query_with_keywords(query)
         
         all_results = []
