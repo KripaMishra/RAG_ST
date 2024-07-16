@@ -26,15 +26,18 @@ class RAGModel:
         # Combine original query, expanded queries, and retrieved documents
         context = f"Original query: {query}\n"
         context += "Retrieved documents:\n"
-        for result in retrieval_results['results']:
-            context += f"- {result['document']}\n"
+        context += f"- {retrieval_results['results'][0]}\n"
+        # for result in retrieval_results['results']:
+        #     context += f"- {result['document']}\n"
 
         # Generate answer using the language model
         prompt = f"{context}\n You are an exper in the matters of cpu setups and system management, specially for GPU. You will be asked questions about gpu setup, cuda errors and other queries realted to cuda setup and cuda funtioning.Based on the above information, and your prior knowledge, please answer the following questions: {query}"
 
         # Tokenize the input
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=self.max_length - 100)
-        
+        print(f"Token IDs: {inputs.input_ids}")
+        print(f"Token IDs shape: {inputs.input_ids.shape}")
+
         # Generate answer
         with torch.no_grad():
             outputs = self.model.generate(
@@ -93,7 +96,7 @@ if __name__ == "__main__":
     model_name = "deepset/roberta-base-squad2"  # Replace with your preferred model
     rag_model = RAGModel(model_name)
     
-    query = "How do I install the Toolkit in a different location?"
+    query = "what is cuda used for ?"
     result = rag_model.process_query(query)
     rag_model.save_query_results(result)
     print(json.dumps(result, indent=2))
