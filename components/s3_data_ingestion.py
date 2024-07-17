@@ -24,7 +24,7 @@ def setup():
     connections.connect("default", host="localhost", port="19530")
     es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': "http"}])
     
-    collection_name = "documents"
+    collection_name = "Test_collection"
     dim = 768  # DPR embedding dimension
     
     if utility.has_collection(collection_name):
@@ -83,7 +83,7 @@ def load_data(input_path):
 if __name__ == "__main__":
     setup()
     
-    input_path = "Steps/documents_export.json"
+    input_path = "/home/ubuntu/project/Steps/result/preprocessed_chunks.json"
     documents = load_data(input_path)
     
     index_documents(documents)

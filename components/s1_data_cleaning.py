@@ -2,6 +2,7 @@ import os
 import json
 import re
 from nltk.tokenize import sent_tokenize
+import tempfile
 
 class DataProcessor:
     def __init__(self, file_path, temp_path):
@@ -101,7 +102,7 @@ class DataProcessor:
 # Example usage
 file_path = '/home/ubuntu/project/Steps/nvidia_docs/nvidia_docs/spiders/output.json'
 
-output_path = '/home/ubuntu/project/Steps/retrieved_result/cleaned_data/cleaned_data_170724.json'
+output_path = '/home/ubuntu/project/Steps/retrieved_result/cleaned_data/cleaned_data_170724.txt'
 
 processor = DataProcessor(file_path, output_path)
 processor.get_data()
