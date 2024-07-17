@@ -1,3 +1,4 @@
+scrapy
 bs4 
 langchain_experimental 
 langchain_openai
