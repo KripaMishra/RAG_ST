@@ -1,15 +1,42 @@
-Sure, here's the entire content formatted as a `README.md` file:
-
-
 # Web Crawling Nvidia Documentation
 
-This document outlines the steps for running this repository.
+## Purpose
 
-#### Description
+This repository contains the implementation of a comprehensive web crawler and Retrieval-Augmented Generation (RAG) model designed to scrape and process data from the NVIDIA CUDA documentation. The primary goal of this project is to develop a system that can effectively retrieve and answer questions based on the scraped documentation. This involves several key steps: web crawling, data chunking, vector database creation, retrieval and re-ranking, and question answering.
 
-This is a RAG (Retrieval-Augmented Generation) model. We will scrape our data using Scrapy and web crawling techniques. The data will be stored in the Milvus vector database, which will later be used as a knowledge source for our Q&A model.
+### Key Features:
+1. **Web Crawling**: Scrapes data from the NVIDIA CUDA documentation and its sub-links up to a depth of 5 levels.
+2. **Data Chunking**: Uses advanced techniques for chunking data based on semantic similarity and topic relevance.
+3. **Vector Database Creation**: Converts chunks into embedding vectors and stores them in the Milvus vector database using FLAT and IVF indexing methods.
+4. **Retrieval and Re-ranking**: Implements hybrid retrieval methods and query expansion techniques to retrieve and re-rank data.
+5. **Question Answering**: Utilizes a Language Model (LLM) to generate accurate answers based on the retrieved data.
+6. **User Interface (Optional)**: Provides a user-friendly interface for inputting queries and displaying answers using frameworks like Streamlit or Gradio.
 
-## Steps
+## Tech Stack
+
+### Programming Language
+- **Python**
+
+### Libraries and Frameworks
+- **Web Crawling**: 
+  - Scrapy
+  - BeautifulSoup
+- **Data Processing**:
+  - NLTK
+  - Gensim
+- **Embedding and Vector Database**:
+  - Transformers (for BERT/bi-encoder embeddings)
+  - Milvus (for vector database creation)
+- **Retrieval Methods**:
+  - BM25
+  - DPR (Dense Passage Retrieval)
+- **Question Answering**:
+  - Hugging Face Transformers
+- **User Interface (Optional)**:
+  - Streamlit
+  - Gradio
+
+## Setup Instructions
 
 ### Step 0: Install the Packages
 
