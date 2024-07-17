@@ -15,12 +15,12 @@ venv/
 
 # Ignore specific directories and files
 volumes/*
-Steps/milvus_demo_test.db
-Steps/clean_text_3.txt
-Steps/embedEtcd.yaml
-Steps/user.yaml
-Steps/StepsDB.db
-Steps/embedEtcd.yaml
-Steps/test_files
-Steps/notebooks
+milvus_demo_test.db
+clean_text_3.txt
+embedEtcd.yaml
+user.yaml
+StepsDB.db
+embedEtcd.yaml
+test_files
+notebooks
 
