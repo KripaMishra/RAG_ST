@@ -16,3 +16,4 @@ transformers
 elasticsearch
 sentence_transformers
 SentencePiece
+nltk

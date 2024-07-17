@@ -99,9 +99,9 @@ class DataProcessor:
             print(f'The content file saved at {self.output_path}')
 
 # Example usage
-file_path = '/content/output.json'
+file_path = '/home/ubuntu/project/Steps/nvidia_docs/nvidia_docs/spiders/output.json'
 
-output_path = '/content/clean_text_4.txt'
+output_path = '/home/ubuntu/project/Steps/retrieved_result/cleaned_data/cleaned_data_170724.json'
 
 processor = DataProcessor(file_path, output_path)
 processor.get_data()
