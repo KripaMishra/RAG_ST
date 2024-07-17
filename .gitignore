@@ -1,4 +1,26 @@
-volumes/*
+# Ignore Python cache files
+__pycache__/
+*.pyc
 
-*.env
-.temp_files/*
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore environment files
+env/
+venv/
+
+# Ignore model files
+*.h5
+*.pt
+
+# Ignore specific directories and files
+volumes/*
+Steps/milvus_demo_test.db
+Steps/clean_text_3.txt
+Steps/embedEtcd.yaml
+Steps/user.yaml
+Steps/StepsDB.db
+Steps/embedEtcd.yaml
+Steps/test_files
+Steps/notebooks
+
