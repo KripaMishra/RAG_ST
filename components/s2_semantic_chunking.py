@@ -13,7 +13,7 @@ class CustomEmbeddings:
     def embed_documents(self, texts):
         return self.model.encode(texts, show_progress_bar=False)
 
-def semantic_chunk_to_documents(file_path, chunk_size=1000, chunk_overlap=200):
+def semantic_chunk_to_documents(file_path, chunk_size=8000, chunk_overlap=100):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
 
@@ -23,7 +23,7 @@ def semantic_chunk_to_documents(file_path, chunk_size=1000, chunk_overlap=200):
     embeddings = CustomEmbeddings(model_name, device)
 
     # Initialize the semantic chunker
-    text_splitter = SemanticChunker(embeddings=embeddings)
+    text_splitter = SemanticChunker(embeddings=embeddings, breakpoint_threshold_amount= 0.9)
 
     # Read the content of the file
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -52,7 +52,7 @@ def export_to_json(documents, output_file):
 
 if __name__ == '__main__':
     # Usage example
-    input_file_path = "/home/ubuntu/project/steps/formatted_data.txt"
+    input_file_path = "/home/ubuntu/project/Steps/clean_text_3.txt"
     output_file_path="/home/ubuntu/project/Steps/chunk_data.json"
     documents = semantic_chunk_to_documents(input_file_path)
     export_to_json(documents,output_file_path)
