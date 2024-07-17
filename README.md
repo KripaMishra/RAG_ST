@@ -1,11 +1,11 @@
 Sure, here's the entire content formatted as a `README.md` file:
 
-```markdown
+
 # Web Crawling Nvidia Documentation
 
 This document outlines the steps for running this repository.
 
-### Description
+#### Description
 
 This is a RAG (Retrieval-Augmented Generation) model. We will scrape our data using Scrapy and web crawling techniques. The data will be stored in the Milvus vector database, which will later be used as a knowledge source for our Q&A model.
 
@@ -14,6 +14,7 @@ This is a RAG (Retrieval-Augmented Generation) model. We will scrape our data us
 ### Step 0: Install the Packages
 
 Install the required packages by running:
+
 ```bash
 pip install -r requirements.txt
 ```
