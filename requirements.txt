@@ -1,3 +1,4 @@
+scrapy
 bs4 
 langchain_experimental 
 langchain_openai
@@ -10,3 +11,10 @@ nltk
 torch
 TensorFlow >= 2.0
 Flax 
+numpy
+transformers
+elasticsearch
+sentence_transformers
+SentencePiece
+nltk
+streamlit 
