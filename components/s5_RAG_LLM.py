@@ -4,7 +4,7 @@ from typing import List, Dict
 import logging
 import argparse
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from s4_data_retrieval import CustomRetrieval, QueryEnhancer
+from components.s4_data_retrieval import CustomRetrieval, QueryEnhancer
 import torch
 
 # Setup logging
