@@ -10,7 +10,7 @@ This repository contains the implementation of a comprehensive web crawler and R
 3. **Vector Database Creation**: Converts chunks into embedding vectors and stores them in the Milvus vector database using FLAT and IVF indexing methods.
 4. **Retrieval and Re-ranking**: Implements hybrid retrieval methods and query expansion techniques to retrieve and re-rank data.
 5. **Question Answering**: Utilizes a Language Model (LLM) to generate accurate answers based on the retrieved data.
-6. **User Interface (Optional)**: Provides a user-friendly interface for inputting queries and displaying answers using frameworks like Streamlit or Gradio.
+6. **User Interface**: Provides a user-friendly interface for inputting queries and displaying answers using Streamlit.
 
 ## Tech Stack
 
@@ -23,7 +23,6 @@ This repository contains the implementation of a comprehensive web crawler and R
   - BeautifulSoup
 - **Data Processing**:
   - NLTK
-  - Gensim
 - **Embedding and Vector Database**:
   - Transformers (for BERT/bi-encoder embeddings)
   - Milvus (for vector database creation)
@@ -32,15 +31,14 @@ This repository contains the implementation of a comprehensive web crawler and R
   - DPR (Dense Passage Retrieval)
 - **Question Answering**:
   - Hugging Face Transformers
-- **User Interface (Optional)**:
+- **User Interface**:
   - Streamlit
-  - Gradio
 
 ## Setup Instructions
 
 ### Step 0: Install the Packages
 
-Install the required packages by running:
+Start by clonning the model and proceed as follows:
 
 ```bash
 pip install -r requirements.txt
@@ -141,7 +139,7 @@ python Steps/components/s3_data_ingestion.py --input_path Steps/result/preproces
 
 Run the following command to test the model:
 ```bash
-python /home/ubuntu/project/Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
+python Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
 
 ```
 
@@ -149,7 +147,7 @@ python /home/ubuntu/project/Steps/components/s4_data_retrieval.py "How do I inst
 
 Run the following command to test the model:
 ```bash
-python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
+python Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
 
 ```
 
