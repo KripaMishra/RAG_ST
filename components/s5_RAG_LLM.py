@@ -75,14 +75,16 @@ class RAGModel:
     def process_query(self, query: str) -> Dict:
         try:
             timestamp = datetime.now().isoformat()
-            retrieval_results = self.retriever.retrieve_and_rerank(query)
+            retrieval_results = self.retriever.retrieve_and_rerank(query)['results']
             expanded_queries = self.query_enhancer.expand_query_with_keywords(query)
             answer = self.generate_answer(query)
 
             return {
                 "timestamp": timestamp,
                 "original_query": query,
-                "answer": answer
+                "context":retrieval_results,
+                "answer": answer,
+                
             }
         except Exception as e:
             logging.error(f"Error processing query: {e}")
@@ -104,7 +106,7 @@ class RAGModel:
             # Generate a default file path if none is provided
             if file_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                file_path = f"/home/ubuntu/project/Steps/retrieved_result/query_results_{timestamp}.json"
+                file_path = f"/home/ubuntu/project/Steps/result/query_results_{timestamp}.json"
             
             # Save the data to a JSON file
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -116,7 +118,7 @@ class RAGModel:
 
 
 def main(query, top_k, file_path):
-    model_name = "deepset/roberta-base-squad2"  # Replace with your preferred model
+    model_name = "mistralai/Mistral-7B-v0.3"  # Replace with your preferred model
     rag_model = RAGModel(model_name)
     
     result = rag_model.process_query(query)
@@ -131,4 +133,4 @@ if __name__ == "__main__":
     parser.add_argument('--file_path', type=str, default=None, help='Path to save query results')
     args = parser.parse_args()
     main(args.query, args.top_k, args.file_path)
-# sample usage : python query_retrieval.py "what is cuda used for?" --top_k 5 --file_path "/path/to/save/query_results.json"
+# sample usage : python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"

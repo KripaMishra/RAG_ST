@@ -1,0 +1,21 @@
+{
+    "timestamp": "2024-07-17T22:48:00.960878",
+    "original_query": "what is cuda used for?",
+    "context": {
+        "timestamp": "2024-07-17T22:48:03.500769",
+        "original_query": "what is cuda used for?",
+        "expanded_queries": [
+            "what is cuda used for? : what is cuda used for?: what is cuda used for?",
+            " : what is cuda used for?: what is cuda used for?",
+            " : what is cuda used for?: what is cuda used for?",
+            " : what is cuda used for?: what is cuda used for?"
+        ],
+        "results": [
+            {
+                "document": "The developer is using PTX code in the application and seeing some errors or issues. What should we do? PTX and application compatibility information can be found in Binary Compatibility . If we build our CUDA application using CUDA 11.0, can it continue to be used with newer NVIDIA drivers (such as CUDA 11.1/R455, 11.x etc.)? Or is it only the other way around? Drivers have always been backwards compatible with CUDA. This means that a CUDA 11.0 application will be compatible with R450 (11.0), R455 (11.1) and beyond. CUDA applications typically statically include all the libraries (for example cudart, CUDA math libraries such as cuBLAS, cuFFT) they need, so they should work on new drivers or CUDA Toolkit installations. In other words, since CUDA is backward compatible, existing CUDA applications can continue to be used with newer CUDA versions. What is the minimum CUDA 11.x driver that supports the CUDA minor version compatibility? The minimum driver version required is 450.80.02. What about new features introduced in minor releases of CUDA? How does a developer build an application using newer CUDA Toolkits (e.g. 11.x) work on a system with a CUDA 11.0 driver (R450)? By using new CUDA versions, users can benefit from new CUDA programming model APIs, compiler optimizations and math library features. A subset of CUDA APIs don’t need a new driver and they can all be used without any driver dependencies. For example, async copy APIs introduced in 11.1 do not need a new driver. To use other CUDA APIs introduced in a minor release (that require a new driver), one would have to implement fallbacks or fail gracefully. This situation is not different from what is available today where developers use macros to compile out features based on CUDA versions. Users should refer to the CUDA headers and documentation for new CUDA APIs introduced in a release. There are some issues that admins can advise the application developers to accommodate in their code. Please refer to the Best Practices Guide for further information. Does CUDA compatibility work with containers? Yes. CUDA minor version compatibility and CUDA forward compatible upgrade both work when using either NGC Deep Learning Framework containers or using containers that are based on the official CUDA base images. The images include the CUDA compatible upgrade libraries and the NVIDIA Container Toolkit (nvidia-docker2) has logic to correctly load the required libraries. I’m running an NGC container and see this error: “This container was built for NVIDIA Driver Release 450.51 or later, but version 418.126.02 was detected and compatibility mode is UNAVAILABLE.”. What could be wrong?",
+                "score": 48.20428466796875
+            }
+        ]
+    },
+    "answer": "An error occurred while generating the answer."
+}

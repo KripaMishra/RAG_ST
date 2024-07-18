@@ -37,7 +37,7 @@ class CustomRetrieval:
         try:
             connections.connect("default", host="localhost", port="19530")
             es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': "http"}])
-            collection = Collection("documents")
+            collection = Collection("Test_collection")
             collection.load()
             logger.info("Setup complete: Elasticsearch and Milvus collection initialized.")
         except Exception as e:
