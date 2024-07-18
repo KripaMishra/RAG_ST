@@ -14,11 +14,6 @@ def main():
     # User input
     query = st.text_area("Enter your query:", height=100)
     
-    # Optional file path input
-    file_path = st.text_input("Enter file path to save results (optional):", "")
-    if not file_path:
-        file_path = None
-
     if st.button("Generate Answer"):
         if query:
             with st.spinner("Generating answer..."):
