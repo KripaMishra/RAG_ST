@@ -39,13 +39,10 @@ class RAGModel:
             context += f"- {retrieval_results['results'][0]}\n"
 
             # Generate answer using the language model
-            prompt = (f"{context}\n You are an expert in the matters of CPU setups and system management, "
-                      "especially for GPU. You will be asked questions about GPU setup, CUDA errors, and other "
-                      "queries related to CUDA setup and CUDA functioning. Based on the above information, and your "
-                      "prior knowledge, please answer the following questions: {query}")
+            prompt = (f"{context}: \n Assume you are an expert ai in the matters of CPU setups and system management, especially for GPU. You will be asked Queries about GPU setup, CUDA errors, and queries related to CUDA setup and CUDA functioning. Based on the results above , please answer the following questions in a clean concise manner. Query: {query} /n Answer:")
 
             # Tokenize the input
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=self.max_length - 100)
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=(self.max_length)//2)
             logging.info(f"Token IDs: {inputs.input_ids}")
             logging.info(f"Token IDs shape: {inputs.input_ids.shape}")
 
@@ -56,12 +53,11 @@ class RAGModel:
                     attention_mask=inputs.attention_mask,
                     max_new_tokens=100,
                     num_return_sequences=1,
-                    temperature=0.7,
+                    temperature=0.10,
                     do_sample=True,
-                    top_k=50,
-                    top_p=0.95,
+                    top_k=25,
+                    top_p=0.75,
                     no_repeat_ngram_size=3,
-                    early_stopping=True
                 )
             
             # Decode the generated answer
@@ -75,8 +71,8 @@ class RAGModel:
     def process_query(self, query: str) -> Dict:
         try:
             timestamp = datetime.now().isoformat()
-            retrieval_results = self.retriever.retrieve_and_rerank(query)['results']
-            expanded_queries = self.query_enhancer.expand_query_with_keywords(query)
+            retrieval_results = self.retriever.retrieve_and_rerank(query)
+            # expanded_queries = self.query_enhancer.expand_query_with_keywords(query)
             answer = self.generate_answer(query)
 
             return {
@@ -118,7 +114,7 @@ class RAGModel:
 
 
 def main(query, top_k, file_path):
-    model_name = "mistralai/Mistral-7B-v0.3"  # Replace with your preferred model
+    model_name = "gpt2-xl"  # Replace with your preferred model
     rag_model = RAGModel(model_name)
     
     result = rag_model.process_query(query)

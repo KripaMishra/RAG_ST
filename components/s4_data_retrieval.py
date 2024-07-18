@@ -1,4 +1,5 @@
 import json
+from typing import List, Optional
 import logging
 import argparse
 from datetime import datetime
@@ -155,7 +156,7 @@ class CustomRetrieval:
             logger.error(f"Query expansion failed: {e}")
             return []
 
-    def retrieve_and_rerank(self, query, top_k=1):
+    def retrieve_and_rerank(self, query, top_k=3):
         try:
             expanded_queries = self.expand_query_with_keywords(query)
 
@@ -164,7 +165,7 @@ class CustomRetrieval:
                 search_results = self.hybrid_search(expanded_query, top_k=top_k*2)
                 all_results.extend(search_results)
 
-            unique_results = list(dict.fromkeys(all_results))[:top_k*2]
+            unique_results = list(dict.fromkeys(all_results))[:top_k]
 
             doc_ids = [doc_id for doc_id, _ in unique_results]
             top_doc_texts = self.fetch_documents(doc_ids)
@@ -201,7 +202,7 @@ class CustomRetrieval:
             # Generate a default file path if none is provided
             if file_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                file_path = f"/home/ubuntu/project/Steps/retrieved_result/query_results_{timestamp}.json"
+                file_path = f"/home/ubuntu/project/Steps/result/query_results_{timestamp}.json"
 
             # Save the data to a JSON file
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -211,46 +212,71 @@ class CustomRetrieval:
         except Exception as e:
             logger.error(f"Saving query results failed: {e}")
 
+
+import logging
+from typing import List, Optional
+import torch
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+
 class QueryEnhancer:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, model_name: str = "t5-small", device: str = "cuda" if torch.cuda.is_available() else "cpu") -> None:
+        self.device = device
+        self.tokenizer = T5Tokenizer.from_pretrained(model_name)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_name).to(self.device)
+        self.logger = logging.getLogger(__name__)
 
-    def expand_query_with_keywords(self, query, num_expansions=3, num_keywords=5):
+    def expand_query_with_keywords(self, query: str, num_expansions: int = 2, num_keywords: int = 5) -> List[str]:
         try:
-            input_text = f"expand query: {query}"
-            input_ids = t5_tokenizer(input_text, return_tensors="pt").input_ids
-
-            outputs = t5_model.generate(
-                input_ids,
-                max_length=50,
-                num_return_sequences=num_expansions,
-                num_beams=num_expansions,
-                temperature=0.7
-            )
-
-            expanded_queries = [t5_tokenizer.decode(output, skip_special_tokens=True) for output in outputs]
-
-            keyword_input = f"generate keywords for: {query}"
-            keyword_ids = t5_tokenizer(keyword_input, return_tensors="pt").input_ids
-
-            keyword_outputs = t5_model.generate(
-                keyword_ids,
-                max_length=30,
-                num_return_sequences=1,
-                num_beams=num_keywords,
-                temperature=0.7
-            )
-
-            keywords = t5_tokenizer.decode(keyword_outputs[0], skip_special_tokens=True).split()
-
+            expanded_queries = self._generate_expanded_queries(query, num_expansions)
+            keywords = self._generate_keywords(query, num_keywords)
+            
             final_queries = [query] + expanded_queries
             final_queries = [f"{q} {' '.join(keywords)}" for q in final_queries]
-
+            
             return final_queries
         except Exception as e:
-            logger.error(f"Query enhancement failed: {e}")
-            return []
+            self.logger.error(f"Query enhancement failed: {e}")
+            return [query]  # Return original query if enhancement fails
 
+    def _generate_expanded_queries(self, query: str, num_expansions: int) -> List[str]:
+        input_text = f"Give {num_expansions} alternate ways to write this query: {query}"
+        input_ids = self.tokenizer(input_text, return_tensors="pt").input_ids.to(self.device)
+
+        outputs = self.model.generate(
+            input_ids,
+            max_length=100,
+            num_return_sequences=num_expansions,
+            num_beams=num_expansions,
+            temperature=0.3,
+            do_sample=True
+        )
+
+        return [self.tokenizer.decode(output, skip_special_tokens=True) for output in outputs]
+
+    def _generate_keywords(self, query: str, num_keywords: int) -> List[str]:
+        keyword_input = f"Add {num_keywords} keywords that summarize this query: {query}"
+        keyword_ids = self.tokenizer(keyword_input, return_tensors="pt").input_ids.to(self.device)
+
+        keyword_outputs = self.model.generate(
+            keyword_ids,
+            max_length=30,
+            num_return_sequences=1,
+            num_beams=num_keywords,
+            temperature=0.6,
+            do_sample=True
+        )
+
+        return self.tokenizer.decode(keyword_outputs[0], skip_special_tokens=True).split()
+
+    def enhance_query(self, query: str, num_expansions: int = 2, num_keywords: int = 3, 
+                      max_length: Optional[int] = None) -> List[str]:
+        enhanced_queries = self.expand_query_with_keywords(query, num_expansions, num_keywords)
+        
+        if max_length:
+            enhanced_queries = [q[:max_length] for q in enhanced_queries]
+        
+        return enhanced_queries
+    
 def main(query, top_k, file_path):
     retrieval = CustomRetrieval()
     retrieval.setup()
@@ -266,4 +292,4 @@ if __name__ == "__main__":
     main(args.query, args.top_k, args.file_path)
 
 
-# sample usage: python query_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
+# sample usage: python /home/ubuntu/project/Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
