@@ -118,26 +118,37 @@ Run Elasticsearch from the command line:
 
 Run the following command to clean the data:
 ```bash
-python3 Steps/components/s1_data_cleaning.py
+python data_cleaning.py --file_path /home/ubuntu/project/Steps/nvidia_docs/nvidia_docs/spiders/output.json --output_path /home/ubuntu/project/Steps/result/claened_data.txt
+
 ```
 
 ### Step 4: Chunking the Data
 
 Run the following command to chunk the data:
 ```bash
-python3 Steps/components/s2_semantic_chunking.py
+python Steps/components/s2_semantic_chunking.py --file_path /home/ubuntu/project/Steps/result/claened_data.txt --similarity_threshold 0.15 --max_chunk_length 400 --output_json_file Steps/result/preprocessed_chunks.json --micro_json_file Steps/result/micro_chunks.json --micro_threshold 100
 ```
 
 ### Step 5: Data Ingestion
 
 Run the following command to ingest the data:
 ```bash
-python3 Steps/components/s3_data_ingestion.py
+python Steps/components/s3_data_ingestion.py --input_path Steps/result/preprocessed_chunks.json --collection_name Test_collection --es_host localhost --es_port 9200 --milvus_host localhost --milvus_port 19530
+
 ```
 
-### Step 6: Testing the Model
+### Step 6: Testing the Retriever Component (optional)
 
 Run the following command to test the model:
 ```bash
-python3 Steps/components/s5_RAG_LLM.py
+python /home/ubuntu/project/Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
+
+```
+
+### Step 7: Generating output using LLM and retriever
+
+Run the following command to test the model:
+```bash
+python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
+
 ```

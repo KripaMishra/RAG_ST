@@ -129,4 +129,6 @@ if __name__ == "__main__":
     parser.add_argument('--file_path', type=str, default=None, help='Path to save query results')
     args = parser.parse_args()
     main(args.query, args.top_k, args.file_path)
+
+    
 # sample usage : python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
