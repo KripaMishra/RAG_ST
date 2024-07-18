@@ -152,3 +152,11 @@ Run the following command to test the model:
 python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
 
 ```
+
+## Update: Accessing streamlit UI
+
+Run the following command to access the UI:
+```bash
+streamlit run main.py
+
+```

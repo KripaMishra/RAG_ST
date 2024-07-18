@@ -102,7 +102,7 @@ class RAGModel:
             # Generate a default file path if none is provided
             if file_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                file_path = f"/home/ubuntu/project/Steps/result/query_results_{timestamp}.json"
+                file_path = f"Steps/result/query_results_{timestamp}.json"
             
             # Save the data to a JSON file
             with open(file_path, 'w', encoding='utf-8') as f:

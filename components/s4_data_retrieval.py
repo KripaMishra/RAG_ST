@@ -202,7 +202,7 @@ class CustomRetrieval:
             # Generate a default file path if none is provided
             if file_path is None:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                file_path = f"/home/ubuntu/project/Steps/result/query_results_{timestamp}.json"
+                file_path = f"Steps/result/query_results_{timestamp}.json"
 
             # Save the data to a JSON file
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -292,4 +292,4 @@ if __name__ == "__main__":
     main(args.query, args.top_k, args.file_path)
 
 
-# sample usage: python /home/ubuntu/project/Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "/path/to/save/query_results.json"
+# sample usage: python Steps/components/s4_data_retrieval.py "How do I install the Toolkit in a different location?" --top_k 5 --file_path "Steps/result/query_results/query_results.json"
