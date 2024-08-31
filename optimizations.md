@@ -61,3 +61,6 @@ The current implementation processes queries sequentially.
 Suggestion: If you're planning to deploy this in a high-traffic environment, consider implementing an asynchronous architecture using something like FastAPI for handling multiple queries concurrently.
 
 These suggestions aim to improve efficiency, robustness, and scalability of your RAG model. Implement them based on your specific use case and performance requirements. Would you like me to elaborate on any particular aspect?
+
+
+
