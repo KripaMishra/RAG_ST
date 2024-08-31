@@ -152,3 +152,5 @@ Run the following command to test the model:
 python /home/ubuntu/project/Steps/components/s5_RAG_LLM.py "what is cuda used for?" --top_k 5 --file_path "/home/ubuntu/project/Steps/result/query_results/"
 
 ```
+
+Fin
